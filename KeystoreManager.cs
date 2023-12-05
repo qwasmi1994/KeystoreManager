@@ -1,10 +1,23 @@
 #if UNITY_EDITOR
-
 using UnityEditor;
 using UnityEngine;
 
 [InitializeOnLoad]
-public class KeystoreManager: EditorWindow
+public class KeystoreManagerInitializer
+{
+    static KeystoreManagerInitializer()
+    {
+        EditorApplication.delayCall += OnEditorLoad;
+    }
+
+    private static void OnEditorLoad()
+    {
+        KeystoreManager.ApplyKeystoreInfoToPlayerSettings();
+    }
+}
+
+[InitializeOnLoad]
+public class KeystoreManager : EditorWindow
 {
     private const string KeystorePathKey = "KeystorePath";
     private const string KeystorePasswordKey = "KeystorePassword";
@@ -21,6 +34,7 @@ public class KeystoreManager: EditorWindow
     static KeystoreManager()
     {
         EditorApplication.update += OnEditorUpdate;
+        LoadKeystoreInfo();
     }
 
     [MenuItem("Tools/Keystore Manager")]
@@ -56,6 +70,7 @@ public class KeystoreManager: EditorWindow
 
     private static void LoadKeystoreInfo()
     {
+        Debug.Log("Loading PlayerPrefs values...");
         keystorePath = PlayerPrefs.GetString(KeystorePathKey, "");
         keystorePassword = PlayerPrefs.GetString(KeystorePasswordKey, "");
         aliasName = PlayerPrefs.GetString(AliasNameKey, "");
@@ -65,6 +80,7 @@ public class KeystoreManager: EditorWindow
 
     private static void SaveKeystoreInfo()
     {
+        Debug.Log("Saving PlayerPrefs values...");
         PlayerPrefs.SetString(KeystorePathKey, keystorePath);
         PlayerPrefs.SetString(KeystorePasswordKey, keystorePassword);
         PlayerPrefs.SetString(AliasNameKey, aliasName);
@@ -73,7 +89,7 @@ public class KeystoreManager: EditorWindow
         PlayerPrefs.Save();
     }
 
-    private static void ApplyKeystoreInfoToPlayerSettings()
+    public static void ApplyKeystoreInfoToPlayerSettings()
     {
         if (!string.IsNullOrEmpty(keystorePath) && !string.IsNullOrEmpty(keystorePassword))
         {
@@ -105,5 +121,4 @@ public class KeystoreManager: EditorWindow
         }
     }
 }
-
 #endif
